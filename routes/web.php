@@ -5,12 +5,6 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
 // Rutas públicas
 Route::get('/', function () {
     return redirect()->route('login');
@@ -22,16 +16,15 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 
 // Rutas protegidas (requieren autenticación)
-Route::middleware(['auth.session'])->group(function () {
+Route::middleware(['auth.session'])->group(function () {  // <- Usamos el alias 'auth.session'
     
-    // Cerrar sesión    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
-    // Dashboard general
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
     
-    // ========== RESERVAS ==========
+    // Reservas
     Route::prefix('reservas')->name('reservas.')->group(function () {
         Route::get('/crear', [ReservaController::class, 'create'])->name('create');
         Route::post('/guardar', [ReservaController::class, 'store'])->name('store');
@@ -41,10 +34,9 @@ Route::middleware(['auth.session'])->group(function () {
         Route::get('/horarios-disponibles', [ReservaController::class, 'horariosDisponibles'])->name('horarios');
     });
     
-    // ========== ADMINISTRACIÓN ==========
-    Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function () {
+    // Rutas de administrador
+    Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function () {  // <- Usamos el alias 'admin'
         
-        // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         
         // Gestión de usuarios
