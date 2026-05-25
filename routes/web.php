@@ -65,3 +65,8 @@ Route::middleware(['auth.session'])->group(function () {  // <- Usamos el alias 
         Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
     });
 });
+
+// Ruta de prueba para verificar middleware
+Route::get('/test-middleware', function () {
+    return "El middleware auth.session funciona! Usuario: " . session('usuario')->nombre;
+})->middleware('auth.session')->name('test.middleware');
