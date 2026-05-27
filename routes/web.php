@@ -26,12 +26,22 @@ Route::middleware(['auth.session'])->group(function () {  // <- Usamos el alias 
     
     // Reservas
     Route::prefix('reservas')->name('reservas.')->group(function () {
-        Route::get('/crear', [ReservaController::class, 'create'])->name('create');
-        Route::post('/guardar', [ReservaController::class, 'store'])->name('store');
+        Route::middleware(['estudiante'])->group(function () {
+            Route::get('/crear', [ReservaController::class, 'create'])->name('create');
+            Route::post('/guardar', [ReservaController::class, 'store'])->name('store');
+        });
         Route::get('/mis-reservas', [ReservaController::class, 'misReservas'])->name('mis-reservas');
         Route::get('/ver/{id}', [ReservaController::class, 'show'])->name('show');
         Route::post('/cancelar/{id}', [ReservaController::class, 'cancelar'])->name('cancelar');
         Route::get('/horarios-disponibles', [ReservaController::class, 'horariosDisponibles'])->name('horarios');
+     });
+    
+    // Rutas de docente
+    Route::prefix('docente')->name('docente.')->middleware(['docente'])->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\DocenteController::class, 'dashboard'])->name('dashboard');
+        Route::get('/reservas', [\App\Http\Controllers\DocenteController::class, 'reservas'])->name('reservas');
+        Route::post('/reservas/aprobar/{id}', [\App\Http\Controllers\DocenteController::class, 'aprobarReserva'])->name('reservas.aprobar');
+        Route::post('/reservas/rechazar/{id}', [\App\Http\Controllers\DocenteController::class, 'rechazarReserva'])->name('reservas.rechazar');
     });
     
     // Rutas de administrador

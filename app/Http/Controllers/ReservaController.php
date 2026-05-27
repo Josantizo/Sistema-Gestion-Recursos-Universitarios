@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Reserva;
 use App\Models\Recurso;
 use App\Models\Historial;
+use App\Models\Usuario;
+use App\Mail\SolicitudReservaDocente;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -91,9 +94,21 @@ class ReservaController extends Controller
             "Reserva creada - Recurso: {$recurso->nombre} - Fecha: {$request->fecha}"
         );
 
+        // Notificar a todos los docentes activos si no es admin
+        if ($usuario->rol !== 'administrador') {
+            $docentes = Usuario::where('rol', 'docente')->where('estado', 'activo')->get();
+            foreach ($docentes as $docente) {
+                try {
+                    Mail::to($docente->correo)->send(new SolicitudReservaDocente($reserva));
+                } catch (\Exception $e) {
+                    logger()->error("No se pudo enviar el correo de nueva solicitud al docente {$docente->correo}: " . $e->getMessage());
+                }
+            }
+        }
+
         $mensaje = $usuario->rol === 'administrador' 
             ? 'Reserva creada y aprobada exitosamente' 
-            : 'Reserva creada exitosamente. Espera la aprobación del administrador';
+            : 'Solicitud de reserva enviada exitosamente. Los docentes han sido notificados.';
             
         return redirect()->route('reservas.mis-reservas')->with('success', $mensaje);
     }
@@ -147,8 +162,8 @@ class ReservaController extends Controller
         $reserva = Reserva::with(['usuario', 'recurso'])->findOrFail($id);
         $usuario = session('usuario');
         
-        // Verificar permiso
-        if ($reserva->id_usuario != $usuario->id_usuario && !$usuario->esAdministrador()) {
+        // Verificar permiso: el solicitante, administrador, o un docente
+        if ($reserva->id_usuario != $usuario->id_usuario && !$usuario->esAdministrador() && $usuario->rol !== 'docente') {
             return redirect()->route('dashboard')->with('error', 'No autorizado');
         }
         

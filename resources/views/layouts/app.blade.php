@@ -35,14 +35,22 @@
                             <i class="fas fa-chart-line"></i> Admin
                         </a>
                     @endif
+
+                    @if(session('usuario')->rol == 'docente' || session('usuario')->rol == 'administrador')
+                        <a href="{{ route('docente.dashboard') }}" class="text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-graduation-cap"></i> Docente
+                        </a>
+                    @endif
                     
-                    <a href="{{ route('reservas.mis-reservas') }}" class="text-gray-600 hover:text-gray-900">
-                        <i class="fas fa-calendar-alt"></i> Mis Reservas
-                    </a>
-                    
-                    <a href="{{ route('reservas.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        <i class="fas fa-plus"></i> Nueva Reserva
-                    </a>
+                    @if(session('usuario')->rol == 'estudiante' || session('usuario')->rol == 'administrador')
+                        <a href="{{ route('reservas.mis-reservas') }}" class="text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-calendar-alt"></i> Mis Reservas
+                        </a>
+                        
+                        <a href="{{ route('reservas.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-plus"></i> Nueva Reserva
+                        </a>
+                    @endif
                     
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf

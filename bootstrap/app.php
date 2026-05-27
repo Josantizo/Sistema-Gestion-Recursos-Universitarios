@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AuthSession;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\DocenteMiddleware;
+use App\Http\Middleware\EstudianteMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.session' => AuthSession::class,
             'admin' => AdminMiddleware::class,
+            'docente' => DocenteMiddleware::class,
+            'estudiante' => EstudianteMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -56,6 +56,8 @@ class AuthController extends Controller
             // Redirigir según rol
             if ($usuario->rol === 'administrador') {
                 return redirect()->route('admin.dashboard')->with('success', 'Bienvenido al panel de administración');
+            } elseif ($usuario->rol === 'docente') {
+                return redirect()->route('docente.dashboard')->with('success', '¡Bienvenido ' . $usuario->nombre . '!');
             }
             
             return redirect()->route('dashboard')->with('success', '¡Bienvenido ' . $usuario->nombre . '!');
